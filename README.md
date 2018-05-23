@@ -10,12 +10,22 @@ There's no executables for now, just running:
 ```Python
 python extract_graphics.py
 ```
-will do the job. Please note that if Python 3 is not your default, you might have to run it as python3 ... .This application works both on Windows and Linux.
+will do the job. Please note that if Python 3 is not your default, you either:
 
+- Run it as `python3 extract_graphics.py`.
+- (Linux) Run the following commands:
+
+```bash
+echo 'alias python=python3' >> ~/.bashrc
+source ~/.bashrc
+```
+And then run it normally.
+
+This application works both on Windows and Linux.
 
 ### GUI
 
-![Graphical User Interface](https://github.com/novalic/nes8bit/blob/master/t_extract_graphics/images/ss.png)
+![Graphical User Interface](https://github.com/novalic/extract_nes_graphics/blob/master/images/ss.png)
 
 The GUI is simple. There's only 4 buttons:
 - ***Dump file*** Let's you browse your computer for a single .nes or .chr file and loads it into the program.
@@ -51,9 +61,9 @@ There's also a status bar that usually indicates what are your next steps to fol
 - ***Python=3.5***
 - ***pypng=0.0.18*** Great .png image manipulation package. Simple and quick to understand.
 - ***numpy=1.13.3*** Some complex operations become really simple.
-- ***Tkinter*** A really simple and powerful package to build GUIs quickly.
+- ***Tkinter*** A really simple and powerful package to build GUIs quickly. (Should already be included in your Python 3 installation).
 
 ## To do
 
-- Might add executables for Windows and Linux.
-- A HELP screen will be implemented inside the program some day.
+- Might add executables for Windows and Linux using [Packer](https://github.com/hashicorp/packer).
+- A HELP screen might be implemented inside the program some day.
