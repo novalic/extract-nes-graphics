@@ -3,7 +3,7 @@ import numpy
 import png
 import os
 import time
-from tkinter import Tk, Frame, Label, Button, TOP, BOTTOM, \
+from tkinter import Tk, Frame, Label, Button, TOP, BOTTOM, NORMAL,\
                     DISABLED, BOTH, PhotoImage, Canvas, StringVar
 from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import askdirectory
