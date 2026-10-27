@@ -117,6 +117,16 @@ class TestSetDirectory:
 
         assert gui.save_dir == str(tmp_path)
 
+    def test_cancelling_keeps_the_existing_save_dir(self, gui, monkeypatch, tmp_path):
+        # Regression test: cancelling 'Save to...' used to wipe out the
+        # default save_dir (the chosen file's own folder) with ''.
+        gui.save_dir = str(tmp_path)
+        monkeypatch.setattr('extract_nes_graphics.gui.askdirectory', lambda **kwargs: '')
+
+        gui.setDirectory()
+
+        assert gui.save_dir == str(tmp_path)
+
 
 class TestConvertFile:
     def test_single_file_success(self, gui, tmp_path):

@@ -113,7 +113,12 @@ class ChrToPng(Tk):
             self.configOptions(True)
 
     def setDirectory(self):
-        self.save_dir = askdirectory()
+        # Cancelling this dialog returns ''; don't let that wipe out the
+        # default save_dir (the file/folder's own location) that getPath()
+        # or getPathDir() already set.
+        chosen = askdirectory()
+        if chosen:
+            self.save_dir = chosen
 
     def convertFile(self):
         self.configOptions(False)
