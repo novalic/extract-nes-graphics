@@ -4,6 +4,8 @@ tests/conftest.py installs a fake tkinter when the real bindings aren't
 available, so these tests exercise ChrToPng's logic (state handling,
 delegating to batch.py) without actually rendering a window.
 """
+from unittest.mock import MagicMock
+
 import pytest
 
 from extract_nes_graphics.gui import ChrToPng, DISABLED, NORMAL
@@ -144,6 +146,18 @@ class TestConvertFile:
         assert (tmp_path / 'LOG.TXT').exists()
         assert 'Not converted (ERROR): 1' in (tmp_path / 'LOG.TXT').read_text()
         assert gui.labelVariable.get() == '2 files processed. See LOG.TXT for info.'
+
+    def test_folder_dump_keeps_the_ui_responsive_between_files(self, gui, tmp_path, monkeypatch):
+        (tmp_path / 'a.chr').write_bytes(VALID_CHR_BYTES)
+        (tmp_path / 'b.chr').write_bytes(VALID_CHR_BYTES)
+        gui.filename = str(tmp_path)
+        gui.save_dir = str(tmp_path)
+        update_idletasks = MagicMock()
+        monkeypatch.setattr(gui, 'update_idletasks', update_idletasks)
+
+        gui.convertFile()
+
+        assert update_idletasks.call_count == 2
 
 
 class TestMain:

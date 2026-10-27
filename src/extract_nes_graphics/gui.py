@@ -125,6 +125,11 @@ class ChrToPng(Tk):
                     bad_files += 1
                     list_bad_files += '@@' + a_file
                 self.labelVariable.set(str(good_files + bad_files) + ' files processed. See LOG.TXT for info.')
+                # Without this, Tkinter only repaints the status label (and
+                # responds to window-manager events like move/resize) once
+                # the whole batch finishes, so a folder dump looks frozen
+                # for its entire duration instead of showing live progress.
+                self.update_idletasks()
 
             # Written once at the end rather than after every file: re-opening
             # and rewriting LOG.TXT from scratch on every iteration is wasted
