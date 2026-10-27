@@ -26,7 +26,7 @@ This application works on Windows, Linux and macOS.
 
 ### GUI
 
-![Graphical User Interface](https://github.com/novalic/extract_nes_graphics/blob/master/images/ss.png)
+![Graphical User Interface](https://github.com/novalic/extract_nes_graphics/blob/master/_img/ss.png)
 
 The GUI is simple. There's only 4 buttons:
 - ***Dump file*** Let's you browse your computer for a single .nes or .chr file and loads it into the program.
