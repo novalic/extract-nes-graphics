@@ -47,10 +47,18 @@ class TestConvertSingleFile:
         with pytest.raises(FileNotFoundError):
             convert_single_file(str(tmp_path / 'missing.chr'), str(tmp_path))
 
-    def test_too_small_chr_raises(self, tmp_path):
-        # Fewer than 128 tiles currently triggers the known zero-step bug.
+    def test_fewer_than_128_tiles_still_converts(self, tmp_path):
+        # Any whole number of tiles converts fine, however small.
         chr_file = tmp_path / 'tiny.chr'
-        chr_file.write_bytes(bytes(16))
+        chr_file.write_bytes(bytes(16))  # 1 tile
+        output_path = convert_single_file(str(chr_file), str(tmp_path))
+        assert os.path.exists(output_path)
+
+    def test_truncated_tile_raises(self, tmp_path):
+        # A file whose length isn't a multiple of 16 bytes has a partial
+        # trailing tile, which fails to decode.
+        chr_file = tmp_path / 'truncated.chr'
+        chr_file.write_bytes(bytes(20))
         with pytest.raises(ValueError):
             convert_single_file(str(chr_file), str(tmp_path))
 
@@ -71,7 +79,7 @@ class TestConvertFolder:
 
     def test_counts_failures_without_stopping_the_batch(self, tmp_path):
         (tmp_path / 'good.chr').write_bytes(VALID_CHR_BYTES)
-        (tmp_path / 'bad.chr').write_bytes(bytes(16))  # too small, will fail
+        (tmp_path / 'bad.chr').write_bytes(bytes(20))  # truncated tile, will fail
 
         good, bad = convert_folder(str(tmp_path))
 
@@ -80,7 +88,7 @@ class TestConvertFolder:
         assert (tmp_path / 'good.chr.png').exists()
 
     def test_writes_log_txt_with_the_failed_file_name(self, tmp_path):
-        (tmp_path / 'bad.chr').write_bytes(bytes(16))
+        (tmp_path / 'bad.chr').write_bytes(bytes(20))  # truncated tile, will fail
 
         convert_folder(str(tmp_path))
 

@@ -37,7 +37,10 @@ def decode_chr(data, tiles_in_row=TILES_IN_ROW):
     """Decode raw CHR bytes into the full pixel matrix for the output PNG."""
     tiles = chr_bytes_to_tiles(data)
     size_chr = len(tiles)
-    img_htiles = int(size_chr / tiles_in_row)
+    # At least 1 tile per row, even when there are fewer tiles than
+    # tiles_in_row (previously this truncated to 0, and range() rejects a
+    # zero step).
+    img_htiles = max(1, int(size_chr / tiles_in_row))
 
     mega_pixel = [tile_hex_to_pixels(tile) for tile in tiles]
 

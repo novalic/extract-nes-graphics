@@ -86,9 +86,22 @@ class TestDecodeChr:
         assert list(result[16][:8]) == [0] * 8
         assert list(result[16][8:]) == [0] * 8
 
-    def test_zero_tiles_in_row_raises_value_error(self):
-        # Known current bug: fewer tiles than `tiles_in_row` makes
-        # img_htiles truncate to 0, and range() rejects a zero step.
-        tiles_data = _solid_tile_bytes(0)  # just 1 tile
+    def test_fewer_tiles_than_tiles_in_row_uses_a_single_tile_per_row(self):
+        # Previously img_htiles truncated to 0 here and range() rejected
+        # the zero step; it now floors to 1 tile per row instead.
+        tiles_data = _solid_tile_bytes(1) + _solid_tile_bytes(2)
+        result = decode_chr(tiles_data, tiles_in_row=128)
+
+        assert len(result) == 24  # 2 content rows + 1 padding row, 8px each
+        assert all(len(row) == 8 for row in result)
+        assert list(result[0]) == [1] * 8
+        assert list(result[8]) == [2] * 8
+        assert list(result[16]) == [0] * 8
+
+    def test_partial_trailing_tile_raises_value_error(self):
+        # A CHR file whose length isn't a multiple of 16 bytes produces a
+        # short last tile; its second bitplane hex-decodes to an empty
+        # string, which int(..., 16) rejects.
+        tiles_data = _solid_tile_bytes(0) + bytes(4)
         with pytest.raises(ValueError):
             decode_chr(tiles_data, tiles_in_row=128)

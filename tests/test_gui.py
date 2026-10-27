@@ -134,7 +134,7 @@ class TestConvertFile:
 
     def test_folder_dump_converts_each_file(self, gui, tmp_path):
         (tmp_path / 'good.chr').write_bytes(VALID_CHR_BYTES)
-        (tmp_path / 'bad.chr').write_bytes(bytes(16))
+        (tmp_path / 'bad.chr').write_bytes(bytes(20))  # truncated tile, will fail
         gui.filename = str(tmp_path)
         gui.save_dir = str(tmp_path)
 
