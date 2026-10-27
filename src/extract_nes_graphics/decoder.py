@@ -36,13 +36,17 @@ def chr_bytes_to_tile_pixels(data):
 
 
 def decode_chr(data, tiles_in_row=TILES_IN_ROW):
-    """Decode raw CHR bytes into the full pixel matrix for the output PNG."""
+    """Decode raw CHR bytes into the full pixel matrix for the output PNG.
+
+    Tiles are laid out left-to-right, top-to-bottom, `tiles_in_row` tiles
+    wide (16 by default - see TILES_IN_ROW). The image is exactly that
+    wide regardless of how many tiles `data` contains; only its height
+    varies with the file size. A source with fewer tiles than
+    `tiles_in_row` simply produces a narrower first (and only) row.
+    """
     tile_pixels = chr_bytes_to_tile_pixels(data)
     size_chr = len(tile_pixels)
-    # At least 1 tile per row, even when there are fewer tiles than
-    # tiles_in_row (previously this truncated to 0, and range() rejects a
-    # zero step).
-    img_htiles = max(1, int(size_chr / tiles_in_row))
+    img_htiles = max(1, tiles_in_row)
 
     mega_pixel = list(tile_pixels)
 

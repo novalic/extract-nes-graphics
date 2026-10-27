@@ -70,17 +70,29 @@ class TestDecodeChr:
         assert list(result[16][:8]) == [0] * 8
         assert list(result[16][8:]) == [0] * 8
 
-    def test_fewer_tiles_than_tiles_in_row_uses_a_single_tile_per_row(self):
-        # Previously img_htiles truncated to 0 here and range() rejected
-        # the zero step; it now floors to 1 tile per row instead.
+    def test_fewer_tiles_than_tiles_in_row_makes_a_narrower_row(self):
+        # Only 2 tiles exist, so even with tiles_in_row=128 they all land
+        # in a single (2-tile-wide, not 128-tile-wide) content row.
         tiles_data = _solid_tile_bytes(1) + _solid_tile_bytes(2)
         result = decode_chr(tiles_data, tiles_in_row=128)
 
-        assert len(result) == 24  # 2 content rows + 1 padding row, 8px each
-        assert all(len(row) == 8 for row in result)
-        assert list(result[0]) == [1] * 8
-        assert list(result[8]) == [2] * 8
-        assert list(result[16]) == [0] * 8
+        assert len(result) == 16  # 1 content row + 1 padding row, 8px each
+        assert all(len(row) == 16 for row in result)
+        assert list(result[0][:8]) == [1] * 8
+        assert list(result[0][8:]) == [2] * 8
+        assert list(result[8]) == [0] * 16
+
+    def test_output_width_is_fixed_when_tile_count_is_a_multiple_of_tiles_in_row(self):
+        # The point of tiles_in_row is a predictable, fixed output width
+        # (e.g. 16 tiles = 128px, the conventional NES CHR viewer width)
+        # instead of the old size-dependent heuristic. 48 tiles is an exact
+        # multiple of 16, so every row - including the padding one - ends
+        # up exactly 16 tiles wide; see the previous test for what happens
+        # with a trailing partial row.
+        many_tiles = _solid_tile_bytes(3) * 48
+        result = decode_chr(many_tiles, tiles_in_row=16)
+
+        assert all(len(row) == 16 * 8 for row in result)
 
     def test_partial_trailing_tile_raises_value_error(self):
         tiles_data = _solid_tile_bytes(0) + bytes(4)
