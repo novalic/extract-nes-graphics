@@ -124,8 +124,12 @@ class ChrToPng(Tk):
                 except Exception:
                     bad_files += 1
                     list_bad_files += '@@' + a_file
-                write_log(dump_dir, good_files, bad_files, list_bad_files, starting_at, time.strftime('%x - %X'))
                 self.labelVariable.set(str(good_files + bad_files) + ' files processed. See LOG.TXT for info.')
+
+            # Written once at the end rather than after every file: re-opening
+            # and rewriting LOG.TXT from scratch on every iteration is wasted
+            # I/O that scales with the number of files in the folder.
+            write_log(dump_dir, good_files, bad_files, list_bad_files, starting_at, time.strftime('%x - %X'))
         else:
             try:
                 convert_single_file(self.filename, self.save_dir)

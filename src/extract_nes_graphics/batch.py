@@ -63,6 +63,10 @@ def convert_folder(dump_dir, save_dir=None):
         except Exception:
             bad_files += 1
             list_bad_files += '@@' + a_file
-        write_log(dump_dir, good_files, bad_files, list_bad_files, starting_at, time.strftime('%x - %X'))
+
+    # Written once at the end rather than after every file: re-opening and
+    # rewriting LOG.TXT from scratch on every iteration is wasted I/O that
+    # scales with the number of files in the folder.
+    write_log(dump_dir, good_files, bad_files, list_bad_files, starting_at, time.strftime('%x - %X'))
 
     return good_files, bad_files
