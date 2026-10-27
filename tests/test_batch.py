@@ -5,6 +5,8 @@ import pytest
 
 from extract_nes_graphics.batch import convert_folder, convert_single_file, is_convertible
 
+from test_ines import build_ines
+
 # A minimal CHR payload that doesn't trip the current "fewer tiles than
 # tiles_in_row" bug (see test_decoder.py): exactly 128 solid-black tiles.
 VALID_CHR_BYTES = bytes(128 * 16)
@@ -66,7 +68,7 @@ class TestConvertSingleFile:
 class TestConvertFolder:
     def test_converts_only_chr_and_nes_files_in_the_folder(self, tmp_path):
         (tmp_path / 'a.chr').write_bytes(VALID_CHR_BYTES)
-        (tmp_path / 'b.nes').write_bytes(VALID_CHR_BYTES)
+        (tmp_path / 'b.nes').write_bytes(build_ines(VALID_CHR_BYTES.ljust(8192, b'\0')))
         (tmp_path / 'notes.txt').write_text('ignore me')
 
         good, bad = convert_folder(str(tmp_path))
@@ -109,3 +111,23 @@ class TestConvertFolder:
         assert bad == 0
         assert (dst_dir / 'a.chr.png').exists()
         assert (src_dir / 'LOG.TXT').exists()
+
+
+class TestConvertSingleFileFromNes:
+    def test_extracts_chr_rom_instead_of_decoding_the_whole_rom_file(self, tmp_path):
+        chr_data = VALID_CHR_BYTES.ljust(8192, b'\0')
+        nes_file = tmp_path / 'game.nes'
+        nes_file.write_bytes(build_ines(chr_data))
+
+        output_path = convert_single_file(str(nes_file), str(tmp_path))
+
+        assert output_path == str(tmp_path / 'game.nes.png')
+        assert os.path.exists(output_path)
+
+    def test_raises_for_a_nes_file_with_no_chr_rom(self, tmp_path):
+        header = bytes([0x4E, 0x45, 0x53, 0x1A, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        nes_file = tmp_path / 'no_chr.nes'
+        nes_file.write_bytes(header + bytes(16384))
+
+        with pytest.raises(ValueError):
+            convert_single_file(str(nes_file), str(tmp_path))

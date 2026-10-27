@@ -10,6 +10,7 @@ import time
 
 from extract_nes_graphics.conversion_log import write_log
 from extract_nes_graphics.decoder import decode_chr
+from extract_nes_graphics.ines import extract_chr
 from extract_nes_graphics.png_writer import save_png
 
 CONVERTIBLE_EXTENSIONS = ('.chr', '.nes')
@@ -19,10 +20,23 @@ def is_convertible(filename):
     return filename.lower().endswith(CONVERTIBLE_EXTENSIONS)
 
 
+def read_chr_data(filename):
+    """Read the raw CHR bytes to decode from a .chr or .nes file.
+
+    A .chr file is treated as raw CHR data. A .nes file is a full iNES ROM,
+    so its CHR ROM bank is located and extracted via the header instead of
+    decoding the whole file (which would mix in the header and PRG code).
+    """
+    with open(filename, 'rb') as source_file:
+        data = source_file.read()
+    if filename.lower().endswith('.nes'):
+        return extract_chr(data)
+    return data
+
+
 def convert_single_file(filename, save_dir):
     """Decode `filename` and write the resulting PNG into `save_dir`."""
-    with open(filename, 'rb') as chr_file:
-        data = chr_file.read()
+    data = read_chr_data(filename)
     pixel_matrix = decode_chr(data)
     output_path = os.path.join(save_dir, os.path.split(filename)[1] + '.png')
     save_png(output_path, pixel_matrix)
