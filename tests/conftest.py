@@ -39,7 +39,7 @@ except ModuleNotFoundError:
     fake_tkinter.StringVar = _FakeStringVar
     for widget_name in ('Frame', 'Label', 'Button', 'Canvas', 'PhotoImage'):
         setattr(fake_tkinter, widget_name, MagicMock(name=widget_name))
-    for const_name in ('TOP', 'BOTTOM', 'DISABLED', 'BOTH'):
+    for const_name in ('TOP', 'BOTTOM', 'DISABLED', 'NORMAL', 'BOTH'):
         setattr(fake_tkinter, const_name, const_name)
 
     fake_filedialog = types.ModuleType('tkinter.filedialog')

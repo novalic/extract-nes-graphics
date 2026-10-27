@@ -2,7 +2,7 @@
 import os
 import time
 from tkinter import Tk, Frame, Label, Button, TOP, BOTTOM, \
-                    DISABLED, BOTH, PhotoImage, Canvas, StringVar
+                    DISABLED, NORMAL, BOTH, PhotoImage, Canvas, StringVar
 from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import askdirectory
 
