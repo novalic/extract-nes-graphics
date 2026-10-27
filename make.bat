@@ -20,13 +20,12 @@ uv run python extract_graphics.py
 goto :eof
 
 :test
-uv run pytest
-goto :eof
-
-:coverage
 uv run coverage run -m pytest
 uv run coverage report -m
 goto :eof
+
+:coverage
+goto test
 
 :check
 uv run ruff check .

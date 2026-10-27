@@ -11,8 +11,8 @@ Dependencies are managed with [uv](https://docs.astral.sh/uv/). A `Makefile` wra
 ```bash
 make install    # create the venv and install dependencies
 make run        # launch the GUI (python extract_graphics.py)
-make test       # run the test suite
-make coverage   # run the test suite with a coverage report
+make test       # run the test suite with a coverage report
+make coverage   # alias for 'make test'
 make check      # lint with ruff
 make fix        # lint with ruff, auto-fixing what it can
 make clean      # remove the venv and other generated files
