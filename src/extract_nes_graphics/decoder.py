@@ -4,53 +4,55 @@ No file or GUI side effects live here on purpose: this module only turns raw
 CHR bytes into the nested pixel matrix that png_writer.save_png() can write
 out, which keeps it simple to unit test.
 """
-import binascii
-
 import numpy
 
 from extract_nes_graphics.constants import TILES_IN_ROW
 
+TILE_SIZE_BYTES = 16  # 2 bitplanes of 8 bytes each
 
-def chr_bytes_to_tiles(data):
-    """Split raw CHR bytes into a list of 32-hex-char tile strings.
 
-    Each NES/Famicom tile is 16 bytes (2 bitplanes of 8 bytes each), which is
-    32 hex characters once hex-encoded.
+def chr_bytes_to_tile_pixels(data):
+    """Decode raw CHR bytes into an (N, 8, 8) array of 2-bit palette indices.
+
+    Each 16-byte tile is two 8x8 bitplanes; a pixel's value is
+    plane0_bit + 2*plane1_bit. This decodes every tile in `data` in a
+    handful of vectorized numpy operations instead of looping over tiles
+    in Python and converting each one through hex strings and bin().
     """
-    in_hex = binascii.hexlify(data).decode('ascii')
-    return [in_hex[index:index + 32] for index in range(0, len(in_hex), 32)]
+    if len(data) % TILE_SIZE_BYTES != 0:
+        raise ValueError(
+            'CHR data length (%d bytes) is not a multiple of %d (one tile).'
+            % (len(data), TILE_SIZE_BYTES)
+        )
 
+    tile_count = len(data) // TILE_SIZE_BYTES
+    if tile_count == 0:
+        return numpy.empty((0, 8, 8), dtype=numpy.uint8)
 
-def tile_hex_to_pixels(tile_hex):
-    """Decode one 32-hex-char CHR tile into an 8x8 matrix of palette indices.
-
-    Each NES tile is stored as two 8x8 bitplanes; the pixel's 2-bit palette
-    index is plane0_bit + 2*plane1_bit.
-    """
-    plane0 = [int(bit) for bit in bin(int(tile_hex[:16], 16))[2:].zfill(64)]
-    plane1 = [int(bit) for bit in bin(int(tile_hex[16:], 16))[2:].zfill(64)]
-    decoded = [x + 2 * y for x, y in zip(plane0, plane1)]
-    return [decoded[index:index + 8] for index in range(0, len(decoded), 8)]
+    tiles = numpy.frombuffer(data, dtype=numpy.uint8).reshape(tile_count, TILE_SIZE_BYTES)
+    plane0_bits = numpy.unpackbits(tiles[:, :8], axis=1).reshape(tile_count, 8, 8)
+    plane1_bits = numpy.unpackbits(tiles[:, 8:], axis=1).reshape(tile_count, 8, 8)
+    return plane0_bits + 2 * plane1_bits
 
 
 def decode_chr(data, tiles_in_row=TILES_IN_ROW):
     """Decode raw CHR bytes into the full pixel matrix for the output PNG."""
-    tiles = chr_bytes_to_tiles(data)
-    size_chr = len(tiles)
+    tile_pixels = chr_bytes_to_tile_pixels(data)
+    size_chr = len(tile_pixels)
     # At least 1 tile per row, even when there are fewer tiles than
     # tiles_in_row (previously this truncated to 0, and range() rejects a
     # zero step).
     img_htiles = max(1, int(size_chr / tiles_in_row))
 
-    mega_pixel = [tile_hex_to_pixels(tile) for tile in tiles]
+    mega_pixel = list(tile_pixels)
 
     reshape = [mega_pixel[index:index + img_htiles] for index in range(0, size_chr, img_htiles)]
-    reshape.append([[[0, 0, 0, 0, 0, 0, 0, 0]] * 8])
+    reshape.append([numpy.zeros((8, 8), dtype=numpy.uint8)])
 
     if len(reshape[-1]) < len(reshape[-2]):
         fill = len(reshape[-2]) - len(reshape[-1])
         for _ in range(fill):
-            reshape[-1].append([[0, 0, 0, 0, 0, 0, 0, 0]] * 8)
+            reshape[-1].append(numpy.zeros((8, 8), dtype=numpy.uint8))
 
     return [
         entry
