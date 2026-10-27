@@ -1,0 +1,22 @@
+[project]
+name = "extract-nes-graphics"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=2.2.6",
+    "pypng>=0.20220715.0",
+]
+
+[project.scripts]
+extract-nes-graphics = "extract_nes_graphics:main"
+
+[build-system]
+requires = ["uv_build>=0.13.4,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "coverage>=7.16.2",
+    "pytest>=9.1.1",
+]
