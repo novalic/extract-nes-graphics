@@ -8,7 +8,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from extract_nes_graphics.gui import ChrToPng, DISABLED, NORMAL
+from extract_nes_graphics.gui import DISABLED, NORMAL, ChrToPng
 
 VALID_CHR_BYTES = bytes(128 * 16)
 

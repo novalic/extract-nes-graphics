@@ -1,15 +1,13 @@
 """Tkinter GUI for the CHR/NES to PNG converter."""
 import os
 import time
-from tkinter import Tk, Frame, Label, Button, TOP, BOTTOM, \
-                    DISABLED, NORMAL, BOTH, PhotoImage, Canvas, StringVar
-from tkinter.filedialog import askopenfilename
-from tkinter.filedialog import askdirectory
+from tkinter import BOTH, BOTTOM, DISABLED, NORMAL, TOP, Button, Canvas, Frame, Label, PhotoImage, StringVar, Tk
+from tkinter.filedialog import askdirectory, askopenfilename
 
 from extract_nes_graphics.batch import convert_single_file, is_convertible
+from extract_nes_graphics.conversion_log import write_log
 
 IMAGES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images')
-from extract_nes_graphics.conversion_log import write_log
 
 
 class ChrToPng(Tk):

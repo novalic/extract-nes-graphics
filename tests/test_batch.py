@@ -2,10 +2,9 @@
 import os
 
 import pytest
+from test_ines import build_ines
 
 from extract_nes_graphics.batch import convert_folder, convert_single_file, is_convertible
-
-from test_ines import build_ines
 
 # A minimal CHR payload that doesn't trip the current "fewer tiles than
 # tiles_in_row" bug (see test_decoder.py): exactly 128 solid-black tiles.

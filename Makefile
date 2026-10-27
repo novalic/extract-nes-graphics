@@ -1,4 +1,4 @@
-.PHONY: install run test coverage clean
+.PHONY: install run test coverage check fix clean
 
 install:
 	uv sync
@@ -12,6 +12,12 @@ test:
 coverage:
 	uv run coverage run -m pytest
 	uv run coverage report -m
+
+check:
+	uv run ruff check .
+
+fix:
+	uv run ruff check --fix .
 
 clean:
 	rm -rf .venv .pytest_cache .coverage htmlcov
