@@ -37,7 +37,7 @@ class ChrToPng(Tk):
         self.but_sdir.pack(fill=BOTH)
         self.but_conv.pack(fill=BOTH)
         self.but_exit.pack(fill=BOTH, side=BOTTOM)
-        famicom_img = PhotoImage(file=os.path.join(IMAGES_DIR, 'img.png'))
+        famicom_img = PhotoImage(file=os.path.join(IMAGES_DIR, 'img.gif'))
         famicom_label = Label(self.frame_w2, image=famicom_img)
         famicom_label.image = famicom_img
         famicom_label.pack(fill=BOTH, expand=True)
@@ -51,7 +51,7 @@ class ChrToPng(Tk):
         self.canvas_area = Canvas(self, width=500, height=400, background="#ffffff")
         self.canvas_area.grid(row=1, column=1)
 
-        back_img = PhotoImage(file=os.path.join(IMAGES_DIR, 'back.png'))
+        back_img = PhotoImage(file=os.path.join(IMAGES_DIR, 'back.gif'))
         back_label = Label(self.canvas_area, image=back_img)
         back_label.image = back_img
         back_label.pack(fill=BOTH, expand=True)
