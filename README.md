@@ -20,6 +20,18 @@ make clean      # remove the venv and other generated files
 
 `make run` is equivalent to running `uv run python extract_graphics.py` directly.
 
+`make` isn't available by default on Windows. Use the included `make.bat` instead, with the same targets (e.g. `make.bat install`, `make.bat run`, `make.bat test`):
+
+```bat
+make.bat install
+make.bat run
+make.bat test
+make.bat coverage
+make.bat check
+make.bat fix
+make.bat clean
+```
+
 Tkinter is required and ships with most Python installations, but isn't something `uv`/`pip` can install - see "Packages and dependencies" below if `import tkinter` fails.
 
 This application works on Windows, Linux and macOS.
