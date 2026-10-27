@@ -6,22 +6,23 @@ This is a basic tool to convert .nes or .chr files to a .png image. There might 
 
 ### Usage
 
-There's no executables for now, just running:
-```Python
-python extract_graphics.py
-```
-will do the job. Please note that if Python 3 is not your default, you either:
-
-- Run it as `python3 extract_graphics.py`.
-- (Linux) Run the following commands:
+Dependencies are managed with [uv](https://docs.astral.sh/uv/). A `Makefile` wraps the common commands:
 
 ```bash
-echo 'alias python=python3' >> ~/.bashrc
-source ~/.bashrc
+make install    # create the venv and install dependencies
+make run        # launch the GUI (python extract_graphics.py)
+make test       # run the test suite
+make coverage   # run the test suite with a coverage report
+make check      # lint with ruff
+make fix        # lint with ruff, auto-fixing what it can
+make clean      # remove the venv and other generated files
 ```
-And then run it normally.
 
-This application works both on Windows and Linux.
+`make run` is equivalent to running `uv run python extract_graphics.py` directly.
+
+Tkinter is required and ships with most Python installations, but isn't something `uv`/`pip` can install - see "Packages and dependencies" below if `import tkinter` fails.
+
+This application works on Windows, Linux and macOS.
 
 ### GUI
 
@@ -56,12 +57,29 @@ The output image dimensions is set internally and tries to build an image with r
 
 There's also a status bar that usually indicates what are your next steps to follow.
 
+### Project layout
+
+The implementation lives under `src/extract_nes_graphics/`:
+
+- `decoder.py` - pure CHR-bytes-to-pixel-matrix decoding (no file/GUI side effects).
+- `ines.py` - parses the iNES `.nes` header to locate and extract the embedded CHR ROM bank.
+- `png_writer.py` - writes a decoded pixel matrix out as a `.png`.
+- `conversion_log.py` - builds/writes the `LOG.TXT` summary of a folder dump.
+- `batch.py` - non-GUI orchestration (single file / whole folder), used by both the GUI and the test suite.
+- `gui.py` - the Tkinter UI, which delegates all of the above.
+
+`extract_graphics.py` at the repo root is kept as a thin, backwards-compatible entry point. Tests live in `tests/`, one file per module above, with 100% coverage.
+
 ## Packages and dependencies
 
-- ***Python=3.5***
-- ***pypng=0.0.18*** Great .png image manipulation package. Simple and quick to understand.
-- ***numpy=1.13.3*** Some complex operations become really simple.
-- ***Tkinter*** A really simple and powerful package to build GUIs quickly. (Should already be included in your Python 3 installation).
+- ***Python >= 3.10***
+- ***[uv](https://docs.astral.sh/uv/)*** Used to manage the virtual environment and dependencies (see `pyproject.toml` / `uv.lock`).
+- ***pypng*** Great .png image manipulation package. Simple and quick to understand.
+- ***numpy*** Used to vectorize CHR tile decoding.
+- ***Tkinter*** A really simple and powerful package to build GUIs quickly. It's part of the Python standard library, not an installable dependency, but it does need to be available in whichever Python you use:
+  - On Linux, if `import tkinter` fails, install your distro's `python3-tk` package.
+  - On macOS, the system's bundled Tk is old and deprecated (and lacks proper PNG support); if you hit `TclError`s, install a modern Tcl/Tk (`brew install tcl-tk`) and build/select a Python that links against it (e.g. via `pyenv install --force` with `PYTHON_CONFIGURE_OPTS` pointing at it).
+- Dev-only: ***pytest***, ***coverage*** and ***ruff*** (linting), installed via `make install`.
 
 ## To do
 
