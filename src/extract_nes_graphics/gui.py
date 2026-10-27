@@ -119,7 +119,7 @@ class ChrToPng(Tk):
                 try:
                     convert_single_file(self.filename, self.save_dir)
                     good_files += 1
-                except:
+                except Exception:
                     bad_files += 1
                     list_bad_files += '@@' + a_file
                 write_log(dump_dir, good_files, bad_files, list_bad_files, starting_at, time.strftime('%x - %X'))
@@ -128,7 +128,7 @@ class ChrToPng(Tk):
             try:
                 convert_single_file(self.filename, self.save_dir)
                 self.labelVariable.set(os.path.split(self.filename)[1] + ' was converted successfully.')
-            except:
+            except Exception:
                 self.labelVariable.set('There was an error while processing ' + os.path.split(self.filename)[1] + '.')
         self.clearVars()
         self.configOptions(True)
