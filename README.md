@@ -95,5 +95,4 @@ The implementation lives under `src/extract_nes_graphics/`:
 
 ## To do
 
-- Might add executables for Windows and Linux using [Packer](https://github.com/hashicorp/packer).
 - A HELP screen might be implemented inside the program some day.
