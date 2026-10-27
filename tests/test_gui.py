@@ -18,6 +18,25 @@ def gui():
     return ChrToPng(None)
 
 
+class TestForceLightAppearance:
+    def test_calls_the_macos_appearance_tcl_command(self, monkeypatch):
+        fake_tk = MagicMock()
+        monkeypatch.setattr(ChrToPng, 'tk', fake_tk, raising=False)
+
+        gui = ChrToPng(None)
+
+        fake_tk.call.assert_any_call('::tk::unsupported::MacWindowStyle', 'appearance', gui, 'aqua')
+
+    def test_swallows_errors_on_platforms_without_the_command(self, monkeypatch):
+        bad_tk = MagicMock()
+        bad_tk.call.side_effect = Exception('not supported here')
+        monkeypatch.setattr(ChrToPng, 'tk', bad_tk, raising=False)
+
+        gui = ChrToPng(None)  # must not raise
+
+        assert gui.labelVariable.get() == 'Please select a CHR file.'
+
+
 class TestInitialize:
     def test_sets_default_status_message(self, gui):
         assert gui.labelVariable.get() == 'Please select a CHR file.'

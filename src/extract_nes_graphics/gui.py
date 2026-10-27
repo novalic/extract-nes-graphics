@@ -14,7 +14,20 @@ class ChrToPng(Tk):
     def __init__(self, parent):
         Tk.__init__(self, parent)
         self.parent = parent
+        self._force_light_appearance()
         self.initialize()
+
+    def _force_light_appearance(self):
+        # All of this UI's colors (the #dfdfdf panels, the purple status
+        # bar, ...) were designed for a plain light theme. On macOS, Tk
+        # otherwise follows the system's Dark Mode and ends up ignoring/
+        # clashing with those explicit colors. This Tcl command is a no-op
+        # (and raises) on any platform other than macOS/Aqua, hence the
+        # try/except.
+        try:
+            self.tk.call("::tk::unsupported::MacWindowStyle", "appearance", self, "aqua")
+        except Exception:
+            pass
 
     def initialize(self):
         # menu left
